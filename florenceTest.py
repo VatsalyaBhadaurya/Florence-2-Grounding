@@ -58,10 +58,29 @@ draw_image = image.copy()
 draw = ImageDraw.Draw(draw_image)
 
 results = parsed[task_prompt]
-for bbox, label in zip(results["bboxes"], results["labels"]):
+for i, (bbox, label) in enumerate(zip(results["bboxes"], results["labels"])):
     x1, y1, x2, y2 = bbox
+
+    width = x2 - x1
+    height = y2 - y1
+    center_x = x1 + width / 2
+    center_y = y1 + height / 2
+
+    print(
+        f"{label} #{i}: center=({center_x:.1f}, {center_y:.1f}), "
+        f"width={width:.1f}, height={height:.1f}"
+    )
+
     draw.rectangle([x1, y1, x2, y2], outline="red", width=4)
     draw.text((x1, max(0, y1 - 20)), label, fill="red")
+
+    # Mark the center point
+    r = 6
+    draw.ellipse(
+        [center_x - r, center_y - r, center_x + r, center_y + r],
+        fill="yellow",
+        outline="black"
+    )
 
 output_path = r"D:\vatty\work\Florence-Test\output.png"
 draw_image.save(output_path)
