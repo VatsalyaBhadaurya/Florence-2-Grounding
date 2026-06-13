@@ -19,10 +19,13 @@ model = AutoModelForCausalLM.from_pretrained(
 
 image = Image.open(r"D:\vatty\work\Florence-Test\image.png").convert("RGB")
 
-prompt = "find where is tomatoes and where exactly is the tomatoes in the image, and give me the coordinates of the tomatoes in the image, and also give me the confidence score of the tomatoes in the image, and also give me the size of the tomatoes in the image, and also give me the color of the tomatoes in the image, and also give me the shape of the tomatoes in the image, and also give me the texture of the tomatoes in the image, and also give me the smell of the tomatoes in the image, and also give me the taste of the tomatoes in the image, and also give me the nutritional value of the tomatoes in the image, and also give me the health benefits of the tomatoes in the image, and also give me the recipes that can be made with tomatoes in the image, and also give me the history of tomatoes in the image, and also give me any other information about tomatoes in the image."
+# Florence-2 task token for grounding a specific phrase to a bounding box
+task_prompt = "<CAPTION_TO_PHRASE_GROUNDING>"
+text_input = "tomatoes"
+prompt = task_prompt + text_input
 
 inputs = processor(
-    text=prompt,    
+    text=prompt,
     images=image,
     return_tensors="pt"
 )
@@ -42,4 +45,10 @@ result = processor.batch_decode(
     skip_special_tokens=False
 )[0]
 
-print(result)
+parsed = processor.post_process_generation(
+    result,
+    task=task_prompt,
+    image_size=(image.width, image.height)
+)
+
+print(parsed)
