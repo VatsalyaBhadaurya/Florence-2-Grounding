@@ -204,6 +204,15 @@ try:
                     current_polygon_parts = polygon_parts
                     current_box_points = box_points
                     current_center = (rect_cx, rect_cy)
+
+                    if current_dims_cm is not None:
+                        w_cm, h_cm = current_dims_cm
+                        print(
+                            f"{label}: {w_cm:.1f}cm x {h_cm:.1f}cm, "
+                            f"dist: {current_distance_m * 100:.1f}cm"
+                        )
+                    else:
+                        print(f"{label}: found, but depth unavailable")
                 else:
                     print(f"'{text}' not found in frame.")
                     current_label = None
