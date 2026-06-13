@@ -1,5 +1,5 @@
 from transformers import AutoProcessor, AutoModelForCausalLM
-from PIL import Image
+from PIL import Image, ImageDraw
 import torch
 
 MODEL_ID = "microsoft/Florence-2-large-ft"
@@ -52,3 +52,17 @@ parsed = processor.post_process_generation(
 )
 
 print(parsed)
+
+# Draw the predicted boxes on the image for visual verification
+draw_image = image.copy()
+draw = ImageDraw.Draw(draw_image)
+
+results = parsed[task_prompt]
+for bbox, label in zip(results["bboxes"], results["labels"]):
+    x1, y1, x2, y2 = bbox
+    draw.rectangle([x1, y1, x2, y2], outline="red", width=4)
+    draw.text((x1, max(0, y1 - 20)), label, fill="red")
+
+output_path = r"D:\vatty\work\Florence-Test\output.png"
+draw_image.save(output_path)
+print(f"Saved visualization to {output_path}")
