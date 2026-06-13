@@ -17,6 +17,8 @@ COLOR_WIDTH, COLOR_HEIGHT, FPS = 1280, 720, 30
 # D415 stereo depth is computed natively at 848x480; requesting 1280x720
 # depth forces firmware upscaling and noticeably degrades accuracy.
 DEPTH_WIDTH, DEPTH_HEIGHT = 848, 480
+# Shrink both views before displaying side by side so the combined window fits on screen
+DISPLAY_SCALE = 0.5
 
 print("Loading Florence-2 model...")
 processor = AutoProcessor.from_pretrained(MODEL_ID, trust_remote_code=True)
@@ -243,7 +245,10 @@ try:
         if current_box_points is not None:
             cv2.drawContours(depth_colormap, [box_pts_int], 0, (0, 0, 255), 2)
 
-        combined = np.hstack((color_image, depth_colormap))
+        display_color = cv2.resize(color_image, None, fx=DISPLAY_SCALE, fy=DISPLAY_SCALE)
+        display_depth = cv2.resize(depth_colormap, None, fx=DISPLAY_SCALE, fy=DISPLAY_SCALE)
+
+        combined = np.hstack((display_color, display_depth))
         cv2.imshow("Florence-2 + RealSense (color | depth)", combined)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
